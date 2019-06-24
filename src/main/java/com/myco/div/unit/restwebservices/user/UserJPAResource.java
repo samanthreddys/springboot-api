@@ -3,6 +3,7 @@ package com.myco.div.unit.restwebservices.user;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -24,13 +25,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class UserJPAResource {
 	// retrieveallusers
 	// GET /users
+
 	
 	@Autowired
-	private UserDaoService service;
+	private UserRepository userRepository;
 	
-	@GetMapping("/users")
+	@GetMapping("/jpa/users")
 	public List<User> retrieveAllUsers() throws NoUsersFoundException{
-		List<User> userlist = service.findAll();
+		List<User> userlist = userRepository.findAll();
 		if(userlist.size()<1) {
 			throw new NoUsersFoundException("No Users found");
 		}
@@ -38,19 +40,19 @@ public class UserJPAResource {
 		return userlist;
 		}
 	
-	@GetMapping("/users/{id}")
+	@GetMapping("/jpa/users/{id}")
 	public Resource<User> retrieveUser(@PathVariable Integer id) throws NoUsersFoundException {
 		
-		User user = service.findOne(id);
+		Optional<User> user = userRepository.findById(id);
 		
-		if(user == null) {
+		if(!user.isPresent()) {
 			throw new UserNotFoundException("id - "+ id);
 		}
 		
 		//HATEOAS -- HyperMedia as the engine of application state
 		//all-users,serverpath,/users
 		
-		Resource<User> resource = new Resource<User>(user);
+		Resource<User> resource = new Resource<User>(user.get());
 		ControllerLinkBuilder linkTo =  linkTo(methodOn(this.getClass()).retrieveAllUsers());
 		resource.add(linkTo.withRel("all-users"));
 		
@@ -61,9 +63,9 @@ public class UserJPAResource {
 	//Created
 	//Input = details of user
 	//Output= Created and return uri;
-	@PostMapping("/users")
+	@PostMapping("/jpa/users")
 	public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
-		User savedUser = service.save(user);
+		User savedUser = userRepository.save(user);
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
 				.buildAndExpand(savedUser.getId())
 				.toUri();
@@ -73,14 +75,12 @@ public class UserJPAResource {
 		
 	}
 	
-	@DeleteMapping("/users/{id}")
+	@DeleteMapping("/jpa/users/{id}")
 	public void deleteUserById(@PathVariable Integer id) {
 		
-		User user = service.deleteById(id);
+		 userRepository.deleteById(id);
 		
-		if(user == null) {
-			throw new UserNotFoundException("id - "+ id);
-		}
+		
 		
 		
 	}

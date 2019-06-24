@@ -22,10 +22,12 @@ public class UserDaoService {
 	}
 	
 	public User save(User user) {
+		
 		if(user.getId()==null) {
 			user.setId(++usercount);
 			user.setDob(new Date());
 		}
+		user.setDob(new Date());
 		users.add(user);
 		return user;
 	}

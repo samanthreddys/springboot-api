@@ -17,6 +17,10 @@ public class User {
 		this.name = name;
 		this.dob = dob;
 	}
+	public User() {
+		super();
+		
+	}
 	
 	@Id
 	@GeneratedValue
