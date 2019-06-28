@@ -1,10 +1,12 @@
 package com.myco.div.unit.restwebservices.user;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Size;
 
@@ -31,6 +33,18 @@ public class User {
 	private String name;
 	@PastOrPresent
 	private Date dob;
+	
+	
+	@OneToMany(mappedBy = "user")
+	private List<Post> post;
+	
+	
+	public List<Post> getPost() {
+		return post;
+	}
+	public void setPost(List<Post> post) {
+		this.post = post;
+	}
 	public Integer getId() {
 		return id;
 	}
